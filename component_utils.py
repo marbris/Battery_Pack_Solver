@@ -1,4 +1,4 @@
-# Battery_Pack_Solver/component_utilities.py
+# Battery_Pack_Solver/component_utilities
 import re
 
 

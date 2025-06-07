@@ -51,6 +51,7 @@ electrolyte_attrs = {
 cathode_attrs = {
     "Description": "Cathode",
     "desc": "c",
+    "Lf": 50e-4,  # cm, thickness of film
     "por": 0.3,  # 1, volume non-solid phase per volume electrode
     "Qm_am": 180,  # mAh/g
     "Vavg": 3.7,  # V, Average Voltage of Electrode
@@ -107,18 +108,26 @@ pouch_cell_attrs = {
 }
 
 pc = PouchCell(pouch_cell_attrs, verbose="v")
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# pc.pg.print_attr_eq()
+# pc.c_cc.print_attr_eq()
+# pc.a_cc.print_attr_eq()
+# pc.s.print_attr_eq()
+# pc.el.print_attr_eq()
+# pc.c.print_attr_eq()
+# pc.a.print_attr_eq()
+# pc.print_attr_eq()
+pc.c.solve_component(verbose="vvv")
 
-pc.pg.print_attr_eq()
-pc.c_cc.print_attr_eq()
-pc.a_cc.print_attr_eq()
-pc.s.print_attr_eq()
-pc.el.print_attr_eq()
-pc.c.print_attr_eq()
-pc.a.print_attr_eq()
-pc.print_attr_eq()
 
-
-pc.print(set="libatt")
+# pc.print(set="libatt")
 pc.print(set="M")
 pc.print(set="L")
 pc.print(set="D")
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+# pc.pg.clear_and_reinitialize()
+# pc.pg.solve_component(verbose="v")
+# pc.pg.print_attr_eq()
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
