@@ -62,7 +62,7 @@ class Component:
         while solved:
             solved = False
             iteration += 1
-            if verbose == "vv":
+            if verbose == "v":
                 print(f"####### Iteration {iteration} #######")
             # for eq in self.products:
             for eq in self.equations:
@@ -92,7 +92,7 @@ class Component:
                         (eq, (self._attributes[var] for var in eq))
                     )
                     if verbose == "vvv" or verbose == "v":
-                        print(f"{equation_str:<60} is inconsistent")
+                        print(f"{equation_str:<60}{'is inconsistent':>25}")
 
                 if status == "consistent":
                     if verbose == "vvv":
@@ -279,9 +279,9 @@ class Component:
                 else:
                     status = "inconsistent"
 
-        values = lhs_values + rhs_values
+        # values = lhs_values + rhs_values
 
-        return values, status, equation_str, term_status_count
+        return (lhs_values, rhs_values), status, equation_str, term_status_count
 
     def print_equations(self, getstring=False):
         """
@@ -371,6 +371,52 @@ class Component:
             return repr_str
         else:
             print(repr_str)
+
+    def get_inconsistent(self):
+
+        # print header foor the inconsistent equations
+
+        print("##################################")
+        print("##### Inconsistent Equations #####")
+        print("##################################")
+        print("----------------------------------")
+        # collect all inconsistent equations and print them,
+        # along with their values
+        for eq in self.equations:
+            values, status, equation_str, term_status_count = self.get_equation(
+                eq, colors=True, rtol=1e-5, atol=1e-8
+            )
+            if status == "inconsistent":
+                print(f"{equation_str:<70}")
+
+                if "*" in equation_str:
+                    operator = " * "
+                elif "+" in equation_str:
+                    operator = " + "
+
+                lhs_values = [f"{val:#.5g}" for val in values[0]]
+                rhs_values = [f"{val:#.5g}" for val in values[1]]
+
+                left_side = operator.join(lhs_values)  # lhs terms separated by operator
+                right_side = operator.join(
+                    rhs_values
+                )  # rhs terms separated by operator
+                equation_values = f"{left_side} =/= {right_side}"
+                print(f"{equation_values:<60}")
+
+                if operator == " * ":
+                    lhs = np.prod(values[0])
+                    rhs = np.prod(values[1])
+                elif operator == " + ":
+                    lhs = np.sum(values[0])
+                    rhs = np.sum(values[1])
+
+                print(f"LHS: {lhs:#.5g}")
+                print(f"RHS: {rhs:#.5g}")
+                # print absolute and relative errors
+                print(f"Absolute Error: {lhs-rhs:.5g}")
+                print(f"Relative Error: {lhs/rhs:.5g}")
+                print("----------------------------------")
 
     def __repr__(self):
         """
@@ -1495,25 +1541,30 @@ class PouchCell(Component):
             ]
 
             # inactive_materials
+            len_in = 0
             if self.c.N_comp > 2:
                 for i in range(1, self.c.N_comp):
                     labellist.append(f"CB({i}) In Cathode Films:")
                     mm_list.append(getattr(self.c, f"Mf_in_{i-1}", np.nan))
                     nn_list.append(getattr(self.c, "N", np.nan))
+                    len_in += 1
             elif self.c.N_comp == 1:
                 labellist.append("CB In Cathode Films:")
                 mm_list.append(getattr(self.c, "Mf_in", np.nan))
                 nn_list.append(getattr(self.c, "N", np.nan))
+                len_in += 1
 
             if self.a.N_comp > 2:
                 for i in range(1, self.a.N_comp):
                     labellist.append(f"CB({i}) In Anode Films:")
                     mm_list.append(getattr(self.a, f"Mf_in_{i-1}", np.nan))
                     nn_list.append(getattr(self.a, "N", np.nan))
+                    len_in += 1
             elif self.a.N_comp == 1:
                 labellist.append("CB In Anode Films:")
                 mm_list.append(getattr(self.a, "Mf_in", np.nan))
                 nn_list.append(getattr(self.a, "N", np.nan))
+                len_in += 1
 
             labellist += [
                 "Al-Foils:",
@@ -1550,18 +1601,19 @@ class PouchCell(Component):
                 for lab, nn, mm in zip(labellist, nn_list, mm_list)
             ]
 
-            for i in [3, 10, 11]:
+            # print(len_in)
+            # print(mm_list)
+            for i in [3, 8 + len_in, 9 + len_in]:
                 str_list[i] = (
                     f"{labellist[i]: <{col1}}{'':>{col2}}{'':>{col3}}{mm_list[i]:>{col4}.2f}"
                 )
-                # str_list[i] = f"{labellist[i]: <47} {mm_list[i]:>7.2f} g"
 
             str_list = [s.replace("nan", "   ") for s in str_list]
 
             print("POUCH CELL MASSES:")
             print(f"{'N': >{col1+col2}}{'mg': >{col3}}{'g': >{col4}}")
             for i, line in enumerate(str_list):
-                if i in [0, 4, 11, 12]:
+                if i in [0, 4, 9 + len_in]:
                     print("-" * (col1 + col2 + col3 + col4))  # Underline the last row
                 print(line)
             print("-" * (col1 + col2 + col3 + col4))  # Underline the last row
