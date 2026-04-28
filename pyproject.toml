@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Battery_Pack_Solver"
+version = "0.1.0"
+description = "A universal pouch cell energy density calculator and solver"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Martin Brischetto", email = "mabr9700@uw.edu"},
+]
+keywords = ["battery", "pouch cell", "energy density", "electrochemistry"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy",
+    "scipy",  
+    "colorama",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "jupyter",
+]
+
+[project.urls]
+Repository = "https://github.com/marbris/Battery_Pack_Solver"
